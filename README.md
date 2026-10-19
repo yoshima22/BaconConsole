@@ -23,6 +23,12 @@ O backend Rust expõe comandos Tauri para inspecionar, verificar hashes e copiar
 
 Use `demo-media/lunar-archive/bacon.json` como referência de formato. A aba **Disco** mostra as ações autorizadas pelo manifesto; a aba **Biblioteca** exibe instalações permanentes registradas localmente. Cache só aparece quando o manifesto autoriza explicitamente o modo `use-cache`. Para validar o backend: `cargo test --manifest-path src-tauri/Cargo.toml`.
 
+## Biblioteca e perfis locais
+
+A biblioteca unificada é persistida em SQLite em `%APPDATA%\com.baconconsole.app\library\baconconsole.sqlite3` (o diretório exato segue o identificador configurado do Tauri). A primeira abertura importa o registro legado `library.json` uma única vez. Jogos são identificados por uma chave estável de origem — nunca somente pelo título — portanto títulos iguais podem coexistir sem sobrescrever instalações diferentes.
+
+O perfil **Convidado** é criado automaticamente. A barra de perfil permite criar perfis locais, alternar o perfil ativo e manter favoritos e histórico de tempo de jogo separados. A Biblioteca permite buscar, filtrar por instalação, mídia e favoritos, e alternar favoritos sem comunicação online. Não há login remoto, Steam, scraping ou RetroAchievements nesta etapa.
+
 ## Emuladores e conteúdo autorizado
 
 O BaconConsole não baixa, distribui ou procura ROMs, BIOS, firmware ou jogos. Use apenas conteúdo que você possua e esteja autorizado a executar. A Etapa 5 instala ferramentas portáteis locais em `%LOCALAPPDATA%\BaconConsole\tools`:

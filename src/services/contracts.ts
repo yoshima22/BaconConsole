@@ -5,6 +5,10 @@ export type CopyRequest = { jobId: string; root: string; destination: string; ta
 export type LibraryRecord = { id: string; title: string; installPath: string; installKind: 'permanent' | 'cache'; requiresDisc: boolean };
 export interface DiscService { inspect(root: string): Promise<BaconDiscSummary>; verify(root: string): Promise<number>; copy(root: string, destination: string): Promise<number>; storageTargets(): Promise<StorageTarget[]>; startCopy(request: CopyRequest): Promise<number>; cancelCopy(jobId: string): Promise<void>; onCopyProgress(listener: (progress: CopyProgress) => void): Promise<() => void>; }
 export interface GameLibrary { list(): Promise<LibraryRecord[]>; }
+export type CatalogInstallation = { id: number; source: string; platform: string; installPath: string; installKind: string; available: boolean; requiresDisc: boolean };
+export type CatalogGame = { id: number; identityKey: string; title: string; platform: string; favorite: boolean; installations: CatalogInstallation[] };
+export type UserProfile = { id: number; name: string; avatar?: string | null };
+export interface CatalogService { listGames(): Promise<CatalogGame[]>; listUsers(): Promise<UserProfile[]>; activeUser(): Promise<UserProfile>; createUser(name: string, avatar?: string): Promise<UserProfile>; setActiveUser(userId: number): Promise<void>; toggleFavorite(gameId: number): Promise<boolean>; }
 export type EmulatorKind = 'retroarch' | 'duckstation' | 'pcsx2' | 'windows-portable';
 export type EmulatorProfile = { id: string; name: string; kind: EmulatorKind; executable: string; cores: Partial<Record<'nes' | 'snes' | 'megadrive' | 'gba', string>> };
 export interface EmulatorProfileService { list(): Promise<EmulatorProfile[]>; bundled(): Promise<EmulatorProfile[]>; save(profile: EmulatorProfile): Promise<void>; }
