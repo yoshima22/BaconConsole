@@ -26,3 +26,9 @@ fn builds_retroarch_core_and_content_as_discrete_arguments() {
 fn refuses_a_configured_emulator_that_is_not_a_real_executable() {
     assert!(validate_profile(&retroarch()).is_err());
 }
+
+#[test]
+fn accepts_the_managed_windows_portable_profile_without_a_global_executable() {
+    let profile = EmulatorProfile::new("windows-portable", "Windows portátil", EmulatorKind::WindowsPortable, "");
+    assert!(validate_profile(&profile).is_ok());
+}
