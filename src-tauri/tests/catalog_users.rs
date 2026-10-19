@@ -1,0 +1,4 @@
+use std::fs;
+use baconconsole::catalog::{Catalog, InstallationInput};
+fn root() -> std::path::PathBuf { let path=std::env::temp_dir().join(format!("bacon-users-{}",std::process::id())); let _=fs::create_dir_all(&path); path }
+#[test] fn isolates_favorites_and_keeps_session_owner() { let catalog=Catalog::open(&root()).unwrap(); catalog.upsert_installation(InstallationInput::new("manual:game","Game","windows","portable","C:/game.exe",false)).unwrap(); let game=catalog.list_games().unwrap().remove(0); let user=catalog.create_user("Luiz",None).unwrap(); catalog.toggle_favorite(1,game.id).unwrap(); assert!(catalog.is_favorite(1,game.id).unwrap()); assert!(!catalog.is_favorite(user.id,game.id).unwrap()); let session=catalog.start_play_session(1,game.id).unwrap(); catalog.set_active_user(user.id).unwrap(); catalog.finish_play_session(session, 42).unwrap(); assert_eq!(catalog.user_play_seconds(1).unwrap(),42); assert_eq!(catalog.user_play_seconds(user.id).unwrap(),0); }
