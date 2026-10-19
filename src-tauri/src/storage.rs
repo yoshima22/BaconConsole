@@ -1,4 +1,4 @@
-use std::{fs, io::{Read, Write}, path::Path};
+use std::{fs, io::Read, path::Path};
 use sha2::{Digest, Sha256};
 use crate::disc::{load_manifest, validate_relative_path, DiscError};
 

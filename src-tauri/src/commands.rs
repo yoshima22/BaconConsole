@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 use serde::Serialize;
-use crate::{disc::{load_manifest, BaconManifest}, storage::{copy_verified, verify_manifest_files}};
+use baconconsole::{disc::{load_manifest, BaconManifest}, storage::{copy_verified, verify_manifest_files}};
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
