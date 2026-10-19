@@ -29,6 +29,14 @@ A biblioteca unificada é persistida em SQLite em `%APPDATA%\com.baconconsole.ap
 
 O perfil **Convidado** é criado automaticamente. A barra de perfil permite criar perfis locais, alternar o perfil ativo e manter favoritos e histórico de tempo de jogo separados. A Biblioteca permite buscar, filtrar por instalação, mídia e favoritos, e alternar favoritos sem comunicação online. Não há login remoto, Steam, scraping ou RetroAchievements nesta etapa.
 
+## Artes e metadados (SteamGridDB)
+
+Em **Biblioteca**, abra **Artes** em um jogo. O SteamGridDB começa como **não conectado**; informe uma chave criada no serviço para habilitar uma busca manual por título. A chave é enviada uma vez para o backend e guardada pelo Gerenciador de Credenciais do Windows; ela não é gravada no SQLite, em arquivos do projeto, logs ou Git.
+
+O BaconConsole mostra resultados de jogos separadamente e exige escolher a correspondência e a arte (capa, background ou logo). Downloads aceitam somente HTTPS dos domínios SteamGridDB e imagens PNG, JPEG ou WebP de até 16 MiB. O backend armazena os binários em `%APPDATA%\com.yoshima22.baconconsole\artwork` e registra somente caminhos relativos, hash, MIME e origem no banco local. Após o download, a arte selecionada continua disponível offline; se a busca falhar, o app conserva a seleção válida ou usa a arte demonstrativa/fundo padrão.
+
+ScreenScraper aparece como **não configurado** nesta etapa. Não há credenciais, chamadas de rede ou dados demonstrativos para ele.
+
 ## Emuladores e conteúdo autorizado
 
 O BaconConsole não baixa, distribui ou procura ROMs, BIOS, firmware ou jogos. Use apenas conteúdo que você possua e esteja autorizado a executar. A Etapa 5 instala ferramentas portáteis locais em `%LOCALAPPDATA%\BaconConsole\tools`:

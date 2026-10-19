@@ -13,7 +13,8 @@ export type MetadataStatus = 'notConfigured' | 'configured';
 export type MetadataCandidate = { id: number; name: string };
 export type ArtworkKind = 'cover' | 'background' | 'logo';
 export type ArtworkRecord = { provider: string; remoteId: number; kind: ArtworkKind; originalUrl: string; localPath: string; mime: string; hash: string };
-export interface MetadataService { status(): Promise<MetadataStatus>; configureSteamGridDb(key: string): Promise<MetadataStatus>; searchSteamGridDb(title: string): Promise<MetadataCandidate[]>; cacheSteamGridDbArtwork(gameId: number, remoteId: number, kind: ArtworkKind, url: string): Promise<ArtworkRecord>; }
+export type ArtworkOption = { id: number; url: string; thumb: string };
+export interface MetadataService { status(): Promise<MetadataStatus>; configureSteamGridDb(key: string): Promise<MetadataStatus>; searchSteamGridDb(title: string): Promise<MetadataCandidate[]>; artworkOptions(remoteId: number, kind: ArtworkKind): Promise<ArtworkOption[]>; cacheSteamGridDbArtwork(gameId: number, remoteId: number, kind: ArtworkKind, url: string): Promise<ArtworkRecord>; selectedArtwork(gameId: number): Promise<ArtworkRecord[]>; }
 export type EmulatorKind = 'retroarch' | 'duckstation' | 'pcsx2' | 'windows-portable';
 export type EmulatorProfile = { id: string; name: string; kind: EmulatorKind; executable: string; cores: Partial<Record<'nes' | 'snes' | 'megadrive' | 'gba', string>> };
 export interface EmulatorProfileService { list(): Promise<EmulatorProfile[]>; bundled(): Promise<EmulatorProfile[]>; save(profile: EmulatorProfile): Promise<void>; }

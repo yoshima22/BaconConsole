@@ -10,6 +10,7 @@ fn persists_selected_artwork_without_persisting_provider_key() {
   let record=ArtworkRecord::new("steamgriddb", 42, ArtworkKind::Cover, "https://cdn.steamgriddb.com/grid.png", "artwork/abc.png", "image/png", "abc");
   store.save_selected_artwork(12, &record).unwrap();
   assert_eq!(store.selected_artwork(12, ArtworkKind::Cover).unwrap().unwrap().local_path, "artwork/abc.png");
+  assert_eq!(store.all_selected_artwork(12).unwrap().len(), 1);
 }
 
 #[test]
