@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "baconconsole.lunar-archive-demo",
+  "title": "Lunar Archive Demo",
+  "platform": "windows",
+  "packageType": "portable",
+  "entryPoint": "Game/LunarArchive.exe",
+  "files": [],
+  "modes": ["play-direct", "copy-to-storage"]
+}
