@@ -1,0 +1,2 @@
+import type { DiscService, BaconDiscSummary } from './contracts';
+export const tauriDiscService: DiscService = { async inspect(root) { const { invoke } = await import('@tauri-apps/api/core'); return invoke<BaconDiscSummary>('inspect_simulated_disc', { root }); }, async verify(root) { const { invoke } = await import('@tauri-apps/api/core'); return invoke<number>('verify_simulated_disc', { root }); }, async copy(root, destination) { const { invoke } = await import('@tauri-apps/api/core'); return invoke<number>('copy_simulated_disc', { root, destination }); } };
