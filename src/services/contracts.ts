@@ -1,2 +1,7 @@
-export type BaconDiscSummary = { id: string; title: string; entryPoint: string; modes: string[]; fileCount: number };
-export interface DiscService { inspect(root: string): Promise<BaconDiscSummary>; verify(root: string): Promise<number>; copy(root: string, destination: string): Promise<number>; }
+export type BaconDiscSummary = { id: string; title: string; platform: string; packageType: string; entryPoint: string; modes: string[]; fileCount: number; totalBytes: number };
+export type StorageTarget = { kind: 'ssd' | 'cache' | 'pc'; root: string; availableBytes: number };
+export type CopyProgress = { jobId: string; copiedBytes: number; totalBytes: number; completedFiles: number; fileCount: number };
+export type CopyRequest = { jobId: string; root: string; destination: string; targetKind: 'permanent' | 'cache' };
+export type LibraryRecord = { id: string; title: string; installPath: string; installKind: 'permanent' | 'cache'; requiresDisc: boolean };
+export interface DiscService { inspect(root: string): Promise<BaconDiscSummary>; verify(root: string): Promise<number>; copy(root: string, destination: string): Promise<number>; storageTargets(): Promise<StorageTarget[]>; startCopy(request: CopyRequest): Promise<number>; cancelCopy(jobId: string): Promise<void>; onCopyProgress(listener: (progress: CopyProgress) => void): Promise<() => void>; }
+export interface GameLibrary { list(): Promise<LibraryRecord[]>; }
