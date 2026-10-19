@@ -1,0 +1,9 @@
+import { useEffect, useRef } from 'react';
+import type { InstallJob } from './discSession';
+import { formatBytes } from './DiscPage';
+
+export function InstallPanel({ job, title, onClose, onCancel, onLibrary }: { job: InstallJob; title: string; onClose: () => void; onCancel: () => void; onLibrary: () => void }) {
+  const closeRef = useRef<HTMLButtonElement>(null); useEffect(() => { if (['completed', 'cancelled', 'failed'].includes(job.state)) closeRef.current?.focus(); }, [job.state]);
+  const percent = job.totalBytes ? Math.round(job.copiedBytes / job.totalBytes * 100) : job.state === 'completed' ? 100 : 0;
+  return <div className="install-overlay" role="dialog" aria-modal="true" aria-label="Instalação"><section className="install-panel"><p className="eyebrow">{job.target === 'cache' ? 'CACHE TEMPORÁRIO' : 'INSTALAÇÃO'}</p><h1>{job.state === 'completed' ? 'Instalação concluída!' : `Instalando ${title}`}</h1><p>{job.state === 'failed' ? job.error : job.state === 'cancelled' ? 'Instalação cancelada.' : 'Preparando, verificando e copiando arquivos para o destino selecionado.'}</p><div className="progress-track"><i style={{ width: `${percent}%` }} /></div><strong>{percent}%</strong><p>{formatBytes(job.copiedBytes)} de {formatBytes(job.totalBytes)}</p>{['preparing', 'verifying', 'copying'].includes(job.state) && <button className="action-button action-button--ghost" onClick={onCancel}>Cancelar instalação</button>}{job.state === 'completed' && <div className="hero-actions"><button className="action-button" onClick={onClose}>Jogar agora</button><button className="action-button action-button--ghost" onClick={onLibrary}>Ir para biblioteca</button></div>}{['failed', 'cancelled'].includes(job.state) && <button ref={closeRef} className="action-button" onClick={onClose}>Voltar</button>}</section></div>;
+}

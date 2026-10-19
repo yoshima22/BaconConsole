@@ -6,6 +6,6 @@ export const tauriDiscService: DiscService = {
   async storageTargets() { const { invoke } = await import('@tauri-apps/api/core'); return invoke<StorageTarget[]>('get_storage_targets'); },
   async startCopy(request) { const { invoke } = await import('@tauri-apps/api/core'); return invoke<number>('start_verified_copy', { ...request }); },
   async cancelCopy(jobId) { const { invoke } = await import('@tauri-apps/api/core'); await invoke('cancel_copy', { jobId }); },
-  async onCopyProgress(listener) { const { listen } = await import('@tauri-apps/api/event'); return listen<CopyProgress>('bacondisc-copy-progress', (event) => listener(event.payload)); },
+  async onCopyProgress(listener) { if (!('__TAURI_INTERNALS__' in window)) return () => {}; const { listen } = await import('@tauri-apps/api/event'); return listen<CopyProgress>('bacondisc-copy-progress', (event) => listener(event.payload)); },
 };
 export const tauriGameLibrary: GameLibrary = { async list() { const { invoke } = await import('@tauri-apps/api/core'); return invoke<LibraryRecord[]>('list_library_records'); } };

@@ -1,0 +1,10 @@
+import type { DiscAction, DiscSessionState } from './discSession';
+import { deriveDiscActions } from './discSession';
+
+export function DiscPage({ session, onAction }: { session: DiscSessionState; onAction: (action: DiscAction) => void }) {
+  if (session.media.state === 'empty' || session.media.state === 'removed') return <section className="disc-page disc-page--empty"><div className="disc-art disc-art--empty">◉</div><div><p className="eyebrow">BACONDISC</p><h1>Nenhum BaconDisc inserido</h1><p>Insira uma mídia simulada pelo painel de desenvolvimento para ver suas ações compatíveis.</p></div></section>;
+  if (session.media.state === 'invalid') return <section className="disc-page disc-page--error"><div className="disc-art disc-art--error">!</div><div><p className="eyebrow">MÍDIA INVÁLIDA</p><h1>Disco inválido</h1><p>{session.media.error}</p></div></section>;
+  const { disc } = session.media; const actions = deriveDiscActions(disc, session.storageTargets);
+  return <section className="disc-page"><div className="disc-art" aria-label="Arte temporária da mídia">◉</div><div className="disc-copy"><p className="eyebrow">DISCOS › DISCO ATUAL</p><h1>{disc.title}</h1><div className="hero-details"><span className="status-badge">PC</span><span className="status-badge">BaconDisc</span><span className="status-badge">{formatBytes(disc.totalBytes)}</span></div><dl><dt>Tipo</dt><dd>{disc.packageType}</dd><dt>Origem</dt><dd>Disco simulado</dd><dt>Arquivos</dt><dd>{disc.fileCount} verificados</dd><dt>Espaço SSD</dt><dd>{formatBytes(session.storageTargets[0]?.availableBytes ?? 0)} disponível</dd></dl></div><aside className="disc-actions"><h2>Ações disponíveis</h2>{actions.map((action) => <button key={action.id} className="disc-action" disabled={!action.enabled} onClick={() => onAction(action)} title={action.reason}>{action.label}<small>{action.reason ?? 'Confirmar'}</small></button>)}</aside></section>;
+}
+export const formatBytes = (bytes: number) => bytes === 0 ? '0 B' : `${(bytes / 1_073_741_824).toFixed(bytes < 1_073_741_824 ? 1 : 1)} GB`;
