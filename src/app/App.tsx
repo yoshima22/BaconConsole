@@ -14,6 +14,7 @@ import { tauriDiscService, tauriGameLibrary } from '../services/tauriAdapters';
 import type { LibraryRecord } from '../services/contracts';
 import './App.css';
 import './disc-flow.css';
+import './artwork.css';
 
 export default function App() {
   const [selectedId, setSelectedId] = useState(demoGames[0].id);
