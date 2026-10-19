@@ -1,7 +1,7 @@
 use std::{collections::HashMap, path::PathBuf, sync::{Arc, Mutex, atomic::AtomicBool}};
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, State};
-use baconconsole::{disc::{load_manifest, manifest_total_bytes, BaconManifest}, library::{list_installs, register_install, LibraryRecord}, storage::{available_space, copy_verified_with, verify_manifest_files, CopyOptions, CopyProgress}};
+use baconconsole::{disc::{load_manifest, manifest_total_bytes, BaconManifest}, emulators::{list_profiles, save_profile, EmulatorProfile}, library::{list_installs, register_install, LibraryRecord}, storage::{available_space, copy_verified_with, verify_manifest_files, CopyOptions, CopyProgress}};
 
 pub struct CopyJobs(pub Mutex<HashMap<String, Arc<AtomicBool>>>);
 #[derive(Serialize)]
@@ -30,3 +30,5 @@ impl CopyProgressEvent { fn from_progress(job_id: String, progress: CopyProgress
 }
 #[tauri::command] pub fn cancel_copy(jobs: State<CopyJobs>, job_id: String) -> Result<(), String> { if let Some(flag) = jobs.0.lock().map_err(|_| "copy job state unavailable".to_string())?.get(&job_id) { flag.store(true, std::sync::atomic::Ordering::Relaxed); } Ok(()) }
 #[tauri::command] pub fn list_library_records(app: AppHandle) -> Result<Vec<LibraryRecord>, String> { let library_root = app.path().app_data_dir().map_err(|error| error.to_string())?.join("library"); list_installs(&library_root).map_err(|error| error.to_string()) }
+#[tauri::command] pub fn list_emulator_profiles(app: AppHandle) -> Result<Vec<EmulatorProfile>, String> { let root = app.path().app_data_dir().map_err(|error| error.to_string())?.join("emulators"); list_profiles(&root).map_err(|error| error.to_string()) }
+#[tauri::command] pub fn save_emulator_profile(app: AppHandle, profile: EmulatorProfile) -> Result<(), String> { let root = app.path().app_data_dir().map_err(|error| error.to_string())?.join("emulators"); save_profile(&root, profile).map_err(|error| error.to_string()) }
