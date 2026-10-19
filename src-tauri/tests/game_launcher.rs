@@ -1,4 +1,4 @@
-use std::{path::PathBuf, sync::{Arc, Mutex}};
+use std::{path::PathBuf, sync::{Arc, Mutex, Condvar}};
 use baconconsole::launcher::{GameLauncher, LaunchError, LaunchRequest, ProcessRunner};
 
 #[derive(Clone, Default)] struct Runner(Arc<Mutex<Vec<(PathBuf, Vec<String>)>>>);
@@ -12,8 +12,30 @@ fn launches_with_discrete_executable_and_arguments() {
 }
 
 #[test]
-fn rejects_a_second_session_while_one_is_running() {
+fn allows_a_new_session_after_the_previous_process_exits() {
     let launcher = GameLauncher::new(Runner::default());
     launcher.launch(LaunchRequest::new("C:/a.exe", vec![])).unwrap();
+    launcher.launch(LaunchRequest::new("C:/b.exe", vec![])).unwrap();
+}
+
+#[derive(Clone, Default)] struct BlockingRunner(Arc<(Mutex<bool>, Condvar)>);
+impl ProcessRunner for BlockingRunner {
+    fn run(&self, _: PathBuf, _: Vec<String>) -> Result<(), String> {
+        let (lock, ready) = &*self.0;
+        let mut release = lock.lock().unwrap();
+        while !*release { release = ready.wait(release).unwrap(); }
+        Ok(())
+    }
+}
+
+#[test]
+fn rejects_a_second_session_while_one_is_running() {
+    let runner = BlockingRunner::default();
+    let launcher = GameLauncher::new(runner.clone());
+    let background = launcher.clone();
+    let handle = std::thread::spawn(move || background.launch(LaunchRequest::new("C:/a.exe", vec![])));
+    std::thread::sleep(std::time::Duration::from_millis(20));
     assert!(matches!(launcher.launch(LaunchRequest::new("C:/b.exe", vec![])), Err(LaunchError::AlreadyRunning)));
+    let (lock, ready) = &*runner.0; *lock.lock().unwrap() = true; ready.notify_all();
+    handle.join().unwrap().unwrap();
 }

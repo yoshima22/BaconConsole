@@ -7,4 +7,6 @@ export interface DiscService { inspect(root: string): Promise<BaconDiscSummary>;
 export interface GameLibrary { list(): Promise<LibraryRecord[]>; }
 export type EmulatorKind = 'retroarch' | 'duckstation' | 'pcsx2' | 'windows-portable';
 export type EmulatorProfile = { id: string; name: string; kind: EmulatorKind; executable: string; cores: Partial<Record<'nes' | 'snes' | 'megadrive' | 'gba', string>> };
-export interface EmulatorProfileService { list(): Promise<EmulatorProfile[]>; save(profile: EmulatorProfile): Promise<void>; }
+export interface EmulatorProfileService { list(): Promise<EmulatorProfile[]>; bundled(): Promise<EmulatorProfile[]>; save(profile: EmulatorProfile): Promise<void>; }
+export type LaunchRequest = { profileId: string; contentRoot: string; contentRelative: string; contentPlatform: 'nes' | 'snes' | 'megadrive' | 'gba' | 'ps1' | 'ps2' | 'windows' };
+export interface LauncherService { launch(request: LaunchRequest): Promise<void>; onState(listener: (state: 'running' | 'returned' | 'failed') => void): Promise<() => void>; }

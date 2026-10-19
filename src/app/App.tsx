@@ -10,8 +10,9 @@ import { DiscPage } from '../features/disc/DiscPage';
 import { InstallPanel } from '../features/disc/InstallPanel';
 import { createDiscSession, discSessionReducer, type DiscAction } from '../features/disc/discSession';
 import { LibraryPage } from '../features/library/LibraryPage';
-import { tauriDiscService, tauriGameLibrary } from '../services/tauriAdapters';
-import type { LibraryRecord } from '../services/contracts';
+import { EmulatorSettingsPage } from '../features/emulators/EmulatorSettingsPage';
+import { tauriDiscService, tauriEmulatorProfiles, tauriGameLibrary } from '../services/tauriAdapters';
+import type { EmulatorKind, EmulatorProfile, LibraryRecord } from '../services/contracts';
 import './App.css';
 import './disc-flow.css';
 import './artwork.css';
@@ -20,6 +21,7 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(demoGames[0].id);
   const [session, dispatch] = useReducer(discSessionReducer, undefined, createDiscSession);
   const [library, setLibrary] = useState<LibraryRecord[]>([]);
+  const [emulatorProfiles, setEmulatorProfiles] = useState<EmulatorProfile[]>([]);
   const [devPath, setDevPath] = useState('.\\demo-media\\lunar-archive');
   const [tab, setTab] = useState(0);
   const selected = useMemo(() => demoGames.find((game) => game.id === selectedId) ?? demoGames[0], [selectedId]);
@@ -30,7 +32,10 @@ export default function App() {
   useGamepadInput(onInput);
   useEffect(() => { const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'ArrowRight') onInput('move-right'); if (event.key === 'ArrowLeft') onInput('move-left'); if (event.key.toLowerCase() === 'q') onInput('previous-tab'); if (event.key.toLowerCase() === 'e') onInput('next-tab'); if (event.key === 'Enter') onInput('confirm'); }; window.addEventListener('keydown', onKeyDown); return () => window.removeEventListener('keydown', onKeyDown); }, [onInput]);
   useEffect(() => { let stop = () => {}; void tauriDiscService.onCopyProgress((progress) => dispatch({ type: 'copy-progressed', progress })).then((unlisten) => { stop = unlisten; }); return () => stop(); }, []);
+  useEffect(() => { void tauriEmulatorProfiles.list().then(async (profiles) => setEmulatorProfiles(profiles.length ? profiles : await tauriEmulatorProfiles.bundled())).catch(() => setEmulatorProfiles([])); }, []);
+  const saveEmulatorProfile = async (profile: EmulatorProfile) => { await tauriEmulatorProfiles.save(profile); setEmulatorProfiles(await tauriEmulatorProfiles.list()); };
+  const chooseEmulatorExecutable = async (kind: EmulatorKind) => window.prompt(`Informe o caminho local do executável para ${kind}.`, emulatorProfiles.find((profile) => profile.kind === kind)?.executable ?? '') || null;
   const onAction = async (action: DiscAction) => { if (!action.enabled || session.media.state !== 'inserted') return; if (action.id === 'details') return; if (action.id === 'play-direct') { window.alert('A execução direta exigirá confirmação explícita.'); return; } const target = action.id === 'use-cache' ? 'cache' : action.id === 'install-pc' ? 'pc' : 'ssd'; const storage = session.storageTargets[0]; if (!storage) return dispatch({ type: 'copy-failed', error: 'Destino indisponível.' }); const jobId = crypto.randomUUID(); dispatch({ type: 'copy-started', jobId, target }); try { await tauriDiscService.startCopy({ jobId, root: session.media.root, destination: storage.root, targetKind: target === 'cache' ? 'cache' : 'permanent' }); dispatch({ type: 'copy-completed' }); setLibrary(await tauriGameLibrary.list()); } catch (error) { dispatch({ type: 'copy-failed', error: error instanceof Error ? error.message : 'Falha na cópia.' }); } };
   const home = <><HomeHero game={selected} discInserted={discInserted} onPlay={() => undefined} /><section><div className="section-heading"><h2>Jogos recentes</h2><span>{demoGames.length} na sua coleção</span></div><div className="games-shelf">{demoGames.map((game) => <GameCard key={game.id} game={game} selected={game.id === selected.id} onSelect={() => setSelectedId(game.id)} />)}</div></section><DiscStatus inserted={discInserted} onToggle={() => discInserted ? dispatch({ type: 'disc-removed' }) : void insertDisc()} /></>;
-  return <main className="console-shell" aria-label="BaconConsole"><TopBar tab={tab} onTab={setTab} />{tab === 2 ? <DiscPage session={session} onAction={onAction} /> : tab === 1 ? <LibraryPage records={library} /> : home}<ControllerHints /><aside className="dev-panel" aria-label="Painel de desenvolvimento"><input aria-label="Pasta do BaconDisc simulado" value={devPath} onChange={(event) => setDevPath(event.target.value)} /><button className="action-button action-button--ghost" onClick={() => discInserted ? dispatch({ type: 'disc-removed' }) : void insertDisc()}>{discInserted ? 'Ejetar BaconDisc' : 'Inserir BaconDisc'}</button></aside>{session.job.state !== 'idle' && <InstallPanel job={session.job} title={session.media.state === 'inserted' ? session.media.disc.title : 'BaconDisc'} onCancel={() => session.job.jobId && void tauriDiscService.cancelCopy(session.job.jobId)} onClose={() => dispatch({ type: 'job-reset' })} onLibrary={() => { dispatch({ type: 'job-reset' }); setTab(1); }} />}</main>;
+  return <main className="console-shell" aria-label="BaconConsole"><TopBar tab={tab} onTab={setTab} />{tab === 3 ? <EmulatorSettingsPage profiles={emulatorProfiles} onSave={saveEmulatorProfile} onChooseExecutable={chooseEmulatorExecutable} /> : tab === 2 ? <DiscPage session={session} onAction={onAction} /> : tab === 1 ? <LibraryPage records={library} /> : home}<ControllerHints /><aside className="dev-panel" aria-label="Painel de desenvolvimento"><input aria-label="Pasta do BaconDisc simulado" value={devPath} onChange={(event) => setDevPath(event.target.value)} /><button className="action-button action-button--ghost" onClick={() => discInserted ? dispatch({ type: 'disc-removed' }) : void insertDisc()}>{discInserted ? 'Ejetar BaconDisc' : 'Inserir BaconDisc'}</button></aside>{session.job.state !== 'idle' && <InstallPanel job={session.job} title={session.media.state === 'inserted' ? session.media.disc.title : 'BaconDisc'} onCancel={() => session.job.jobId && void tauriDiscService.cancelCopy(session.job.jobId)} onClose={() => dispatch({ type: 'job-reset' })} onLibrary={() => { dispatch({ type: 'job-reset' }); setTab(1); }} />}</main>;
 }

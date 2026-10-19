@@ -1,5 +1,5 @@
 use std::path::Path;
-use baconconsole::emulators::{retroarch_arguments, resolve_profile_path, EmulatorKind, EmulatorProfile, Platform};
+use baconconsole::emulators::{retroarch_arguments, resolve_profile_path, validate_profile, EmulatorKind, EmulatorProfile, Platform};
 
 fn retroarch() -> EmulatorProfile { EmulatorProfile::new("retro", "RetroArch", EmulatorKind::RetroArch, "RetroArch/retroarch.exe") }
 
@@ -20,4 +20,9 @@ fn builds_retroarch_core_and_content_as_discrete_arguments() {
     profile.cores.insert(Platform::Nes, "C:/RetroArch/cores/nestopia_libretro.dll".into());
     let arguments = retroarch_arguments(&profile, Platform::Nes, Path::new("C:/Games/demo.nes")).unwrap();
     assert_eq!(arguments, vec!["-L", "C:/RetroArch/cores/nestopia_libretro.dll", "C:/Games/demo.nes"]);
+}
+
+#[test]
+fn refuses_a_configured_emulator_that_is_not_a_real_executable() {
+    assert!(validate_profile(&retroarch()).is_err());
 }
