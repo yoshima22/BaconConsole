@@ -5,3 +5,6 @@ export type CopyRequest = { jobId: string; root: string; destination: string; ta
 export type LibraryRecord = { id: string; title: string; installPath: string; installKind: 'permanent' | 'cache'; requiresDisc: boolean };
 export interface DiscService { inspect(root: string): Promise<BaconDiscSummary>; verify(root: string): Promise<number>; copy(root: string, destination: string): Promise<number>; storageTargets(): Promise<StorageTarget[]>; startCopy(request: CopyRequest): Promise<number>; cancelCopy(jobId: string): Promise<void>; onCopyProgress(listener: (progress: CopyProgress) => void): Promise<() => void>; }
 export interface GameLibrary { list(): Promise<LibraryRecord[]>; }
+export type EmulatorKind = 'retroarch' | 'duckstation' | 'pcsx2' | 'windows-portable';
+export type EmulatorProfile = { id: string; name: string; kind: EmulatorKind; executable: string; cores: Partial<Record<'nes' | 'snes' | 'megadrive' | 'gba', string>> };
+export interface EmulatorProfileService { list(): Promise<EmulatorProfile[]>; save(profile: EmulatorProfile): Promise<void>; }

@@ -1,4 +1,4 @@
-import type { BaconDiscSummary, CopyProgress, DiscService, GameLibrary, LibraryRecord, StorageTarget } from './contracts';
+import type { BaconDiscSummary, CopyProgress, DiscService, EmulatorProfile, EmulatorProfileService, GameLibrary, LibraryRecord, StorageTarget } from './contracts';
 export const tauriDiscService: DiscService = {
   async inspect(root) { const { invoke } = await import('@tauri-apps/api/core'); return invoke<BaconDiscSummary>('inspect_simulated_disc', { root }); },
   async verify(root) { const { invoke } = await import('@tauri-apps/api/core'); return invoke<number>('verify_simulated_disc', { root }); },
@@ -9,3 +9,4 @@ export const tauriDiscService: DiscService = {
   async onCopyProgress(listener) { if (!('__TAURI_INTERNALS__' in window)) return () => {}; const { listen } = await import('@tauri-apps/api/event'); return listen<CopyProgress>('bacondisc-copy-progress', (event) => listener(event.payload)); },
 };
 export const tauriGameLibrary: GameLibrary = { async list() { const { invoke } = await import('@tauri-apps/api/core'); return invoke<LibraryRecord[]>('list_library_records'); } };
+export const tauriEmulatorProfiles: EmulatorProfileService = { async list() { const { invoke } = await import('@tauri-apps/api/core'); return invoke<EmulatorProfile[]>('list_emulator_profiles'); }, async save(profile) { const { invoke } = await import('@tauri-apps/api/core'); await invoke('save_emulator_profile', { profile }); } };
