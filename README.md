@@ -11,6 +11,10 @@ npm run test -- --run
 npm run build
 ```
 
+## Pré-requisitos Tauri no Windows
+
+Para executar o host nativo, instale Rust com `winget install --id Rustlang.Rustup`, escolha o toolchain MSVC, e instale Visual Studio Build Tools com **Desktop development with C++**. Windows 10/11 normalmente já inclui o WebView2 Runtime. Reinicie o terminal e valide com `cargo --version`, então execute `npm run tauri dev`.
+
 O painel de simulação no canto inferior direito alterna o estado local do BaconDisc. Nenhuma mídia, instalação, conta ou jogo real é acessado nesta etapa.
 
 ## Limitações atuais
