@@ -37,7 +37,7 @@ Saves, estados e configurações pertencem a cada emulador em sua instalação p
 
 ## Limitações atuais
 
-- O seletor visual de conteúdo autorizado será substituído por um diálogo nativo de arquivo; por enquanto o caminho pode ser informado/configurado na interface e o launcher só aceita conteúdo dentro da raiz validada.
+- O caminho completo da ROM ou executável autorizado pode ser informado em **Configurações → Emuladores → Conteúdo autorizado**. Um diálogo nativo de arquivo poderá substituir esse campo em uma etapa futura; o launcher só aceita conteúdo dentro da raiz validada.
 - A seleção de um destino externo para “Instalar no PC” ainda reutiliza o destino gerenciado; o seletor nativo de pasta é a próxima integração necessária.
 - O fluxo completo requer abrir o host Tauri, pois o navegador comum não expõe a ponte de comandos nativos.
 - A API Gamepad é uma camada browser/WebView2 defensiva para layouts `standard`; a compatibilidade com hardware deve ser validada no host Tauri após instalar Rust.
