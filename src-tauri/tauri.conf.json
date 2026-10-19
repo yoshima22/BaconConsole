@@ -12,5 +12,5 @@
   "app": {
     "windows": [{ "title": "BaconConsole", "width": 1280, "height": 720, "resizable": true }]
   },
-  "bundle": { "active": true, "targets": "all", "icon": [] }
+  "bundle": { "active": true, "targets": "all", "icon": ["icons/icon.ico"] }
 }
