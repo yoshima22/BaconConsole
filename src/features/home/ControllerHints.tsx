@@ -1,0 +1,1 @@
+export function ControllerHints() { return <footer className="controller-hints" aria-label="Atalhos do controle"><span><b>◉</b> Selecionar</span><span><b>↩</b> Voltar</span><span><b>← →</b> Navegar</span><span><b>LB RB</b> Abas</span></footer>; }
