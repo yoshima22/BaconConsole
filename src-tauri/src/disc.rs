@@ -44,3 +44,11 @@ pub fn load_manifest(root: &Path) -> Result<BaconManifest, DiscError> {
     for file in &manifest.files { validate_relative_path(&file.path)?; if file.sha256.len() != 64 || !file.sha256.bytes().all(|byte| byte.is_ascii_hexdigit()) { return Err(DiscError::UnsupportedPackage); } }
     Ok(manifest)
 }
+
+pub fn manifest_total_bytes(root: &Path) -> Result<u64, DiscError> {
+    let manifest = load_manifest(root)?;
+    manifest.files.iter().try_fold(0_u64, |total, file| {
+        let path = root.join(validate_relative_path(&file.path)?);
+        Ok(total + std::fs::metadata(path)?.len())
+    })
+}
