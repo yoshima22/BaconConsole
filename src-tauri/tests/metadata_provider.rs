@@ -1,5 +1,5 @@
-use std::{fs, path::PathBuf};
-use baconconsole::metadata::{validate_artwork_url, ArtworkCache, SteamGridDbProvider};
+use std::{fs, io::Cursor, path::PathBuf};
+use baconconsole::metadata::{read_artwork_limited, validate_artwork_url, ArtworkCache, SteamGridDbProvider, MAX_ARTWORK_BYTES};
 
 fn root(name: &str) -> PathBuf { let root=std::env::temp_dir().join(format!("baconconsole-artwork-{name}-{}",std::process::id())); fs::create_dir_all(&root).unwrap(); root }
 
@@ -13,3 +13,5 @@ fn rejects_non_https_and_local_artwork_urls() { assert!(validate_artwork_url("fi
 fn caches_png_by_hash_without_duplicate_writes() { let cache=ArtworkCache::new(&root("cache")).unwrap(); let first=cache.store("https://cdn.steamgriddb.com/a.png","image/png",b"image").unwrap(); let second=cache.store("https://cdn.steamgriddb.com/a.png","image/png",b"image").unwrap(); assert_eq!(first.hash,second.hash); assert_eq!(first.local_path,second.local_path); }
 #[test]
 fn rejects_unknown_mime_and_oversized_artwork() { let cache=ArtworkCache::new(&root("limits")).unwrap(); assert!(cache.store("https://cdn.steamgriddb.com/a.gif","image/gif",b"no").is_err()); assert!(cache.store("https://cdn.steamgriddb.com/a.png","image/png",&vec![0; 16*1024*1024+1]).is_err()); }
+#[test]
+fn stops_a_response_without_content_length_at_the_artwork_limit() { assert!(read_artwork_limited(Cursor::new(vec![0; MAX_ARTWORK_BYTES + 1])).is_err()); }

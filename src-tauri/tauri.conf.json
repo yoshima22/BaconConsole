@@ -10,6 +10,9 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "security": {
+      "assetProtocol": { "enable": true, "scope": ["$APPDATA/com.yoshima22.baconconsole/artwork/**/*"] }
+    },
     "windows": [{ "title": "BaconConsole", "width": 1280, "height": 720, "resizable": true }]
   },
   "bundle": { "active": true, "targets": "all", "icon": ["icons/icon.ico"] }
