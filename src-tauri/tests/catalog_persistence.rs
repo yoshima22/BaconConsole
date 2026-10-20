@@ -48,3 +48,18 @@ fn persists_a_local_import_profile_and_reimports_without_duplicates() {
     assert_eq!(games[0].installations[0].source, "local-import");
     assert_eq!(games[0].installations[0].emulator_profile_id.as_deref(), Some("duckstation"));
 }
+
+#[test]
+fn returns_only_available_local_imports_for_catalog_launch() {
+    let root = temp_root("launchable-local-import");
+    let catalog = Catalog::open(&root).unwrap();
+    catalog.upsert_installation(InstallationInput::local_import(
+        "local:ps1:c:/games/chrono.cue", "chrono", "ps1", "C:/Games/chrono.cue", "duckstation",
+    )).unwrap();
+    let game = catalog.list_games().unwrap().remove(0);
+
+    let installation = catalog.launchable_local_import(game.id, game.installations[0].id).unwrap().unwrap();
+
+    assert_eq!(installation.emulator_profile_id.as_deref(), Some("duckstation"));
+    assert!(catalog.launchable_local_import(game.id, game.installations[0].id + 99).unwrap().is_none());
+}
