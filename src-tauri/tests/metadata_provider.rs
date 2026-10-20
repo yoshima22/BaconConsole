@@ -1,5 +1,5 @@
 use std::{fs, io::Cursor, path::PathBuf};
-use baconconsole::metadata::{read_artwork_limited, validate_artwork_url, ArtworkCache, SteamGridDbProvider, MAX_ARTWORK_BYTES};
+use baconconsole::metadata::{read_artwork_limited, validate_artwork_url, classify_connection_status, IntegrationState, ArtworkCache, SteamGridDbProvider, MAX_ARTWORK_BYTES};
 
 fn root(name: &str) -> PathBuf { let root=std::env::temp_dir().join(format!("baconconsole-artwork-{name}-{}",std::process::id())); fs::create_dir_all(&root).unwrap(); root }
 
@@ -15,3 +15,5 @@ fn caches_png_by_hash_without_duplicate_writes() { let cache=ArtworkCache::new(&
 fn rejects_unknown_mime_and_oversized_artwork() { let cache=ArtworkCache::new(&root("limits")).unwrap(); assert!(cache.store("https://cdn.steamgriddb.com/a.gif","image/gif",b"no").is_err()); assert!(cache.store("https://cdn.steamgriddb.com/a.png","image/png",&vec![0; 16*1024*1024+1]).is_err()); }
 #[test]
 fn stops_a_response_without_content_length_at_the_artwork_limit() { assert!(read_artwork_limited(Cursor::new(vec![0; MAX_ARTWORK_BYTES + 1])).is_err()); }
+#[test]
+fn classifies_unauthorized_and_rate_limited_connection_checks_as_sanitized_errors() { assert_eq!(classify_connection_status(reqwest::StatusCode::UNAUTHORIZED).state,IntegrationState::Error); assert_eq!(classify_connection_status(reqwest::StatusCode::TOO_MANY_REQUESTS).state,IntegrationState::Error); }
