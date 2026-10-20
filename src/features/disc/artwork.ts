@@ -6,4 +6,10 @@ const artworkByGame: Record<string, Artwork> = {
   'baconconsole.lunar-archive-demo': { background: '/assets/chronolegends-background.png', cover: '/assets/chronolegends-cover.png' },
 };
 
-export const resolveArtwork = (gameId?: string): Artwork => gameId ? artworkByGame[gameId] ?? defaultArtwork : defaultArtwork;
+const normalizedTitleArtwork: Record<string, Artwork> = { 'chrono legends': artworkByGame['chrono-legends'] };
+
+export const resolveArtwork = (gameId?: string, title?: string): Artwork => {
+  if (gameId && artworkByGame[gameId]) return artworkByGame[gameId];
+  const titleKey = title?.trim().toLocaleLowerCase();
+  return titleKey ? normalizedTitleArtwork[titleKey] ?? defaultArtwork : defaultArtwork;
+};
