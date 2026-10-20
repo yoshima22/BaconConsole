@@ -31,11 +31,15 @@ O perfil **Convidado** é criado automaticamente. A barra de perfil permite cria
 
 ## Artes e metadados (SteamGridDB)
 
+Em **Configurações → Integrações → SteamGridDB**, informe a chave e escolha **Salvar e testar**. O estado só muda para conectado quando a API responde com sucesso; uma falha de rede, chave recusada ou limitação de taxa aparece sem expor a chave. Em seguida, use **Biblioteca → Artes** para associar capa, background ou logo manualmente.
+
 Em **Biblioteca**, abra **Artes** em um jogo. O SteamGridDB começa como **não conectado**; informe uma chave criada no serviço para habilitar uma busca manual por título. A chave é enviada uma vez para o backend e guardada pelo Gerenciador de Credenciais do Windows; ela não é gravada no SQLite, em arquivos do projeto, logs ou Git.
 
 O BaconConsole mostra resultados de jogos separadamente e exige escolher a correspondência e a arte (capa, background ou logo). Downloads aceitam somente HTTPS dos domínios SteamGridDB e imagens PNG, JPEG ou WebP de até 16 MiB. O backend armazena os binários em `%APPDATA%\com.yoshima22.baconconsole\artwork` e registra somente caminhos relativos, hash, MIME e origem no banco local. Após o download, a arte selecionada continua disponível offline; se a busca falhar, o app conserva a seleção válida ou usa a arte demonstrativa/fundo padrão.
 
 ScreenScraper aparece como **não configurado** nesta etapa. Não há credenciais, chamadas de rede ou dados demonstrativos para ele.
+
+Steam, ScreenScraper e RetroAchievements são mostrados em **Configurações → Integrações** com seu estado real. Nesta versão eles permanecem indisponíveis: Steam local, o adaptador ScreenScraper e a Web API do RetroAchievements serão integrados em entregas próprias, sem simular conta, biblioteca, conquistas ou pontuação.
 
 ## Emuladores e conteúdo autorizado
 

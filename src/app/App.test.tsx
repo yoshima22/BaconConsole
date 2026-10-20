@@ -12,4 +12,11 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: /select orbit of ember/i }));
     expect(screen.getByRole('heading', { name: 'Orbit of Ember' })).toBeInTheDocument();
   });
+
+  it('opens the integrations section from Settings', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Configurações' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Integrações' }));
+    expect(screen.getByRole('heading', { name: 'Integrações' })).toBeInTheDocument();
+  });
 });
