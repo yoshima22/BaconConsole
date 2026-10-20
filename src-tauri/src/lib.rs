@@ -5,4 +5,5 @@ pub mod library;
 pub mod launcher;
 pub mod local_library;
 pub mod metadata;
+pub mod steam_library;
 pub mod storage;
