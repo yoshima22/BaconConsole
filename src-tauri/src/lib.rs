@@ -3,5 +3,6 @@ pub mod catalog;
 pub mod emulators;
 pub mod library;
 pub mod launcher;
+pub mod local_library;
 pub mod metadata;
 pub mod storage;

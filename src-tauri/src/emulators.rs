@@ -5,6 +5,7 @@ use crate::disc::DiscError;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum Platform { Nes, Snes, Megadrive, Gba, Ps1, Ps2, Windows }
+impl Platform { pub fn key(self) -> &'static str { match self { Self::Nes => "nes", Self::Snes => "snes", Self::Megadrive => "megadrive", Self::Gba => "gba", Self::Ps1 => "ps1", Self::Ps2 => "ps2", Self::Windows => "windows" } } }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum EmulatorKind { RetroArch, Duckstation, Pcsx2, WindowsPortable }

@@ -11,6 +11,7 @@ export const tauriDiscService: DiscService = {
 export const tauriGameLibrary: GameLibrary = { async list() { const { invoke } = await import('@tauri-apps/api/core'); return invoke<LibraryRecord[]>('list_library_records'); } };
 export const tauriCatalog: CatalogService = {
   async listGames() { const { invoke } = await import('@tauri-apps/api/core'); return invoke<CatalogGame[]>('list_catalog_games'); },
+  async importAuthorizedLibrary(request) { const { invoke } = await import('@tauri-apps/api/core'); return invoke('import_authorized_library', request); },
   async listUsers() { const { invoke } = await import('@tauri-apps/api/core'); return invoke<UserProfile[]>('list_local_users'); },
   async activeUser() { const { invoke } = await import('@tauri-apps/api/core'); return invoke<UserProfile>('get_active_local_user'); },
   async createUser(name, avatar) { const { invoke } = await import('@tauri-apps/api/core'); return invoke<UserProfile>('create_local_user', { name, avatar }); },

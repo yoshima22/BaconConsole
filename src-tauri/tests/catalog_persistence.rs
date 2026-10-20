@@ -26,3 +26,25 @@ fn imports_legacy_json_only_once() {
     let first = Catalog::open(&root).unwrap(); assert_eq!(first.list_games().unwrap().len(), 1); drop(first);
     fs::write(root.join("library.json"), "[]").unwrap(); let second = Catalog::open(&root).unwrap(); assert_eq!(second.list_games().unwrap().len(), 1);
 }
+
+#[test]
+fn persists_a_local_import_profile_and_reimports_without_duplicates() {
+    let root = temp_root("local-import");
+    let catalog = Catalog::open(&root).unwrap();
+    let input = InstallationInput::local_import(
+        "local:ps1:c:/games/chrono.cue",
+        "chrono",
+        "ps1",
+        "C:/Games/chrono.cue",
+        "duckstation",
+    );
+
+    catalog.upsert_installation(input.clone()).unwrap();
+    catalog.upsert_installation(input).unwrap();
+
+    let games = catalog.list_games().unwrap();
+    assert_eq!(games.len(), 1);
+    assert_eq!(games[0].installations.len(), 1);
+    assert_eq!(games[0].installations[0].source, "local-import");
+    assert_eq!(games[0].installations[0].emulator_profile_id.as_deref(), Some("duckstation"));
+}
