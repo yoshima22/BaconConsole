@@ -1,5 +1,5 @@
 use std::{path::PathBuf, sync::{Arc, Mutex, Condvar}};
-use baconconsole::launcher::{GameLauncher, LaunchError, LaunchRequest, ProcessRunner};
+use baconconsole::launcher::{steam_launch_request, GameLauncher, LaunchError, LaunchRequest, ProcessRunner};
 
 #[derive(Clone, Default)] struct Runner(Arc<Mutex<Vec<(PathBuf, Vec<String>)>>>);
 impl ProcessRunner for Runner { fn run(&self, executable: PathBuf, arguments: Vec<String>) -> Result<(), String> { self.0.lock().unwrap().push((executable, arguments)); Ok(()) } }
@@ -39,3 +39,5 @@ fn rejects_a_second_session_while_one_is_running() {
     let (lock, ready) = &*runner.0; *lock.lock().unwrap() = true; ready.notify_all();
     handle.join().unwrap().unwrap();
 }
+#[test]
+fn builds_fixed_steam_uri_only_for_decimal_app_ids(){let request=steam_launch_request("42").unwrap();assert_eq!(request.arguments,vec!["steam://run/42"]);assert!(steam_launch_request("42&x=1").is_err());}
