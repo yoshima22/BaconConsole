@@ -3,5 +3,5 @@
   "identifier": "default",
   "description": "Permite eventos internos do BaconConsole na janela principal.",
   "windows": ["main"],
-  "permissions": ["core:default", "core:event:default"]
+  "permissions": ["core:default", "core:event:default", "dialog:default"]
 }

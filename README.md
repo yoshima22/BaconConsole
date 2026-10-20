@@ -56,3 +56,23 @@ Saves, estados e configurações pertencem a cada emulador em sua instalação p
 - O fluxo completo requer abrir o host Tauri, pois o navegador comum não expõe a ponte de comandos nativos.
 - A API Gamepad é uma camada browser/WebView2 defensiva para layouts `standard`; a compatibilidade com hardware deve ser validada no host Tauri após instalar Rust.
 - A Home utiliza dados e arte abstrata locais.
+# BaconConsole
+
+## Biblioteca local em modo console
+
+O BaconConsole usa os emuladores gerenciados instalados em %LOCALAPPDATA%\BaconConsole\tools quando eles estão disponíveis: RetroArch para NES, SNES, Mega Drive e GBA; DuckStation para PS1; e PCSX2 para PS2. A tela de Emuladores mostra esse estado automaticamente. A escolha manual de executável existe somente para substituir uma instalação em uma configuração avançada.
+
+Na Biblioteca, selecione **Adicionar jogos locais**, escolha uma pasta local autorizada, a plataforma e o emulador compatível. A importação apenas lê nomes e caminhos dos arquivos aceitos; ela não executa mídia durante a varredura e não envia arquivos para a internet.
+
+| Plataforma | Formatos importados |
+| --- | --- |
+| NES | .nes |
+| SNES | .sfc, .smc |
+| Mega Drive | .md, .gen, .bin |
+| GBA | .gba |
+| PS1 | .cue, .chd, .iso |
+| PS2 | .chd, .iso |
+
+Após importar, use **Jogar** no cartão da Biblioteca e confirme a abertura. O BaconConsole valida a mídia e o emulador associado antes de iniciar qualquer processo. BIOS e configurações de cada emulador continuam sendo responsabilidade do usuário e permanecem locais.
+
+Steam ainda é um adaptador separado: esta etapa não usa executáveis Steam escolhidos manualmente e não descobre bibliotecas Steam automaticamente.

@@ -7,10 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "test": "vitest",
-    "tauri": "tauri"
+    "tauri": "cmd /c \"set PATH=%USERPROFILE%\\.cargo\\bin;%PATH%&& tauri\""
   },
   "dependencies": {
     "@tauri-apps/api": "^2.0.0",
+    "@tauri-apps/plugin-dialog": "^2.8.3",
     "@vitejs/plugin-react": "latest",
     "react": "latest",
     "react-dom": "latest",
