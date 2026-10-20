@@ -1,7 +1,7 @@
 import type { CatalogGame } from '../../services/contracts';
 
 export function GameDetailsPanel({ game, artwork, onPlay, onClose, onEditArtwork }: { game: CatalogGame; artwork: { background: string; cover?: string; logo?: string }; onPlay: (installationId: number) => void; onClose: () => void; onEditArtwork?: () => void }) {
-  const launchable = game.installations.filter((item) => item.available && item.emulatorProfileId);
+  const launchable = game.installations.filter((item) => item.available && (item.source === 'steam' || Boolean(item.emulatorProfileId)));
   const main = launchable[0];
   return <section className="game-details" data-testid="game-details" style={{ backgroundImage: `linear-gradient(90deg, rgb(7 14 25 / 96%) 0%, rgb(7 14 25 / 78%) 48%, rgb(7 14 25 / 20%) 100%), url(${artwork.background})` }} aria-label={`Detalhes de ${game.title}`}>
     <button className="library-filter game-details__back" onClick={onClose}>Voltar</button>

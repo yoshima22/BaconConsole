@@ -10,10 +10,29 @@ describe('LibraryPage local launches', () => {
       profiles={[]}
       onToggleFavorite={vi.fn()}
       onChooseFolder={vi.fn()}
+      onChooseExecutable={vi.fn()}
       onImport={vi.fn()}
+      onSyncSteam={vi.fn()}
+      onRegisterWindowsApp={vi.fn()}
       onLaunch={vi.fn()}
     /></OverlayHost>);
 
     expect(screen.getByRole('button', { name: 'Jogar chrono' })).toBeEnabled();
+  });
+
+  it('offers play for an available Steam installation', () => {
+    render(<OverlayHost><LibraryPage
+      games={[{ id: 8, identityKey: 'steam:42', title: 'Steam Chrono', platform: 'windows', favorite: false, installations: [{ id: 10, source: 'steam', platform: 'windows', installPath: '42', installKind: 'steam', available: true, requiresDisc: false }] }]}
+      profiles={[]}
+      onToggleFavorite={vi.fn()}
+      onChooseFolder={vi.fn()}
+      onChooseExecutable={vi.fn()}
+      onImport={vi.fn()}
+      onSyncSteam={vi.fn()}
+      onRegisterWindowsApp={vi.fn()}
+      onLaunch={vi.fn()}
+    /></OverlayHost>);
+
+    expect(screen.getByRole('button', { name: 'Jogar Steam Chrono' })).toBeEnabled();
   });
 });

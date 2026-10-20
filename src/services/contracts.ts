@@ -9,8 +9,10 @@ export type CatalogInstallation = { id: number; source: string; platform: string
 export type CatalogGame = { id: number; identityKey: string; title: string; platform: string; favorite: boolean; installations: CatalogInstallation[] };
 export type LocalImportRequest = { root: string; platform: LaunchRequest['contentPlatform']; profileId: string };
 export type LocalImportResult = { imported: number; titles: string[] };
+export type SteamSyncResult = { imported: number; titles: string[] };
+export type WindowsAppResult = { title: string };
 export type UserProfile = { id: number; name: string; avatar?: string | null };
-export interface CatalogService { listGames(): Promise<CatalogGame[]>; importAuthorizedLibrary(request: LocalImportRequest): Promise<LocalImportResult>; listUsers(): Promise<UserProfile[]>; activeUser(): Promise<UserProfile>; createUser(name: string, avatar?: string): Promise<UserProfile>; setActiveUser(userId: number): Promise<void>; toggleFavorite(gameId: number): Promise<boolean>; }
+export interface CatalogService { listGames(): Promise<CatalogGame[]>; importAuthorizedLibrary(request: LocalImportRequest): Promise<LocalImportResult>; syncSteamLibrary(root?: string): Promise<SteamSyncResult>; registerWindowsApplication(path: string): Promise<WindowsAppResult>; listUsers(): Promise<UserProfile[]>; activeUser(): Promise<UserProfile>; createUser(name: string, avatar?: string): Promise<UserProfile>; setActiveUser(userId: number): Promise<void>; toggleFavorite(gameId: number): Promise<boolean>; }
 export type MetadataStatus = 'notConfigured' | 'configured';
 export type IntegrationId = 'steam' | 'steamgriddb' | 'screenscraper' | 'retroachievements';
 export type IntegrationState = 'notConfigured' | 'configured' | 'checking' | 'connected' | 'error' | 'unavailable';

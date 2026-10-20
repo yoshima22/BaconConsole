@@ -1,4 +1,4 @@
-import type { ArtworkKind, ArtworkOption, ArtworkRecord, BaconDiscSummary, CatalogGame, CatalogService, CopyProgress, DiscService, EmulatorProfile, EmulatorProfileService, GameLibrary, IntegrationStatus, LauncherService, LibraryRecord, MetadataCandidate, MetadataService, MetadataStatus, StorageTarget, UserProfile } from './contracts';
+import type { ArtworkKind, ArtworkOption, ArtworkRecord, BaconDiscSummary, CatalogGame, CatalogService, CopyProgress, DiscService, EmulatorProfile, EmulatorProfileService, GameLibrary, IntegrationStatus, LauncherService, LibraryRecord, MetadataCandidate, MetadataService, MetadataStatus, SteamSyncResult, StorageTarget, UserProfile, WindowsAppResult } from './contracts';
 export const tauriDiscService: DiscService = {
   async inspect(root) { const { invoke } = await import('@tauri-apps/api/core'); return invoke<BaconDiscSummary>('inspect_simulated_disc', { root }); },
   async verify(root) { const { invoke } = await import('@tauri-apps/api/core'); return invoke<number>('verify_simulated_disc', { root }); },
@@ -12,6 +12,8 @@ export const tauriGameLibrary: GameLibrary = { async list() { const { invoke } =
 export const tauriCatalog: CatalogService = {
   async listGames() { const { invoke } = await import('@tauri-apps/api/core'); return invoke<CatalogGame[]>('list_catalog_games'); },
   async importAuthorizedLibrary(request) { const { invoke } = await import('@tauri-apps/api/core'); return invoke('import_authorized_library', request); },
+  async syncSteamLibrary(root) { const { invoke } = await import('@tauri-apps/api/core'); return invoke<SteamSyncResult>('sync_steam_library', { root }); },
+  async registerWindowsApplication(path) { const { invoke } = await import('@tauri-apps/api/core'); return invoke<WindowsAppResult>('register_windows_application', { path }); },
   async listUsers() { const { invoke } = await import('@tauri-apps/api/core'); return invoke<UserProfile[]>('list_local_users'); },
   async activeUser() { const { invoke } = await import('@tauri-apps/api/core'); return invoke<UserProfile>('get_active_local_user'); },
   async createUser(name, avatar) { const { invoke } = await import('@tauri-apps/api/core'); return invoke<UserProfile>('create_local_user', { name, avatar }); },
@@ -24,4 +26,5 @@ export const tauriLauncher: LauncherService = { async launch(request) { const { 
 export const tauriFilePicker = {
   async folder() { const { open } = await import('@tauri-apps/plugin-dialog'); const selected = await open({ directory: true, multiple: false, title: 'Selecione a pasta de jogos' }); return typeof selected === 'string' ? selected : null; },
   async executable() { const { open } = await import('@tauri-apps/plugin-dialog'); const selected = await open({ directory: false, multiple: false, filters: [{ name: 'Executáveis', extensions: ['exe'] }], title: 'Selecione o executável do emulador' }); return typeof selected === 'string' ? selected : null; },
+  async gameExecutable() { const { open } = await import('@tauri-apps/plugin-dialog'); const selected = await open({ directory: false, multiple: false, filters: [{ name: 'Executáveis', extensions: ['exe'] }], title: 'Selecione um jogo para adicionar à biblioteca' }); return typeof selected === 'string' ? selected : null; },
 };

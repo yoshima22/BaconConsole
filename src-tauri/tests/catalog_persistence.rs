@@ -1,5 +1,6 @@
 use std::fs;
 use baconconsole::catalog::{Catalog, InstallationInput};
+use baconconsole::steam_library::SteamInstall;
 
 fn temp_root(name: &str) -> std::path::PathBuf { let root = std::env::temp_dir().join(format!("baconconsole-catalog-{name}-{}", std::process::id())); let _ = fs::create_dir_all(&root); root }
 
@@ -62,4 +63,23 @@ fn returns_only_available_local_imports_for_catalog_launch() {
 
     assert_eq!(installation.emulator_profile_id.as_deref(), Some("duckstation"));
     assert!(catalog.launchable_local_import(game.id, game.installations[0].id + 99).unwrap().is_none());
+}
+
+#[test]
+fn preserves_steam_availability_when_syncing() {
+    let root = temp_root("steam-availability");
+    let catalog = Catalog::open(&root).unwrap();
+    catalog.upsert_steam_installs(&[SteamInstall { app_id: 42, title: "Chrono".into(), install_path: root.join("missing"), available: false }]).unwrap();
+    let game = catalog.list_games().unwrap().remove(0);
+    assert!(!game.installations[0].available);
+    assert!(catalog.launchable_steam(game.id, game.installations[0].id).unwrap().is_none());
+}
+
+#[test]
+fn returns_an_available_windows_application_for_launch() {
+    let root = temp_root("windows-app");
+    let catalog = Catalog::open(&root).unwrap();
+    catalog.upsert_installation(InstallationInput::new("windows:c:/games/chrono.exe", "Chrono", "windows", "windows-app", "C:/Games/Chrono.exe", false)).unwrap();
+    let game = catalog.list_games().unwrap().remove(0);
+    assert_eq!(catalog.launchable_windows_application(game.id, game.installations[0].id).unwrap().unwrap().source, "windows-app");
 }
