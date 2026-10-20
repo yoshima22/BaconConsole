@@ -1,5 +1,5 @@
 use std::{fs, io::Cursor, path::PathBuf};
-use baconconsole::metadata::{read_artwork_limited, validate_artwork_url, classify_connection_status, IntegrationState, ArtworkCache, SteamGridDbProvider, MAX_ARTWORK_BYTES};
+use baconconsole::metadata::{read_artwork_limited, validate_artwork_url, classify_connection_status, IntegrationState, ArtworkCache, RetroAchievementsProvider, SteamGridDbProvider, MAX_ARTWORK_BYTES};
 
 fn root(name: &str) -> PathBuf { let root=std::env::temp_dir().join(format!("baconconsole-artwork-{name}-{}",std::process::id())); fs::create_dir_all(&root).unwrap(); root }
 
@@ -17,3 +17,5 @@ fn rejects_unknown_mime_and_oversized_artwork() { let cache=ArtworkCache::new(&r
 fn stops_a_response_without_content_length_at_the_artwork_limit() { assert!(read_artwork_limited(Cursor::new(vec![0; MAX_ARTWORK_BYTES + 1])).is_err()); }
 #[test]
 fn classifies_unauthorized_and_rate_limited_connection_checks_as_sanitized_errors() { assert_eq!(classify_connection_status(reqwest::StatusCode::UNAUTHORIZED).state,IntegrationState::Error); assert_eq!(classify_connection_status(reqwest::StatusCode::TOO_MANY_REQUESTS).state,IntegrationState::Error); }
+#[test]
+fn parses_a_retroachievements_profile_without_exposing_credentials() { let profile=RetroAchievementsProvider::parse_profile_response(r#"{"User":"Luiz","AvatarUrl":"https://media.retroachievements.org/UserPic/Luiz.png","TotalPoints":120,"RichPresence":"Playing Chrono"}"#).unwrap(); assert_eq!(profile.username,"Luiz"); assert_eq!(profile.total_points,120); assert_eq!(profile.rich_presence.as_deref(),Some("Playing Chrono")); }
