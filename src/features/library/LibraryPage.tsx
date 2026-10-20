@@ -4,6 +4,8 @@ import { resolveArtwork } from '../disc/artwork';
 import { tauriMetadata } from '../../services/tauriAdapters';
 import { ArtworkPicker } from './ArtworkPicker';
 import { LocalImportPanel } from './LocalImportPanel';
+import { GameDetailsPanel } from './GameDetailsPanel';
+import { useOverlay } from '../../components/OverlayHost';
 
 type Filter = 'all' | 'installed' | 'disc' | 'favorites';
 
@@ -21,6 +23,7 @@ export function LibraryPage({ games, profiles, onToggleFavorite, onChooseFolder,
   const [showImport, setShowImport] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [cached, setCached] = useState<Record<number, Record<string, string>>>({});
+  const overlay = useOverlay();
   const refreshArtwork = async (gameId: number) => {
     try {
       const records = await tauriMetadata.selectedArtwork(gameId);
@@ -35,12 +38,13 @@ export function LibraryPage({ games, profiles, onToggleFavorite, onChooseFolder,
     return matchesQuery && (filter === 'all' || filter === 'installed' && installed || filter === 'disc' && requiresDisc || filter === 'favorites' && game.favorite);
   }), [games, filter, query]);
   const launch = async (game: CatalogGame, installationId: number) => {
-    if (!window.confirm('Confirmar execução de ' + game.title + '?')) return;
+    if (!await overlay.confirm({ title: 'Iniciar jogo', message: `Abrir ${game.title} na instalação selecionada?`, confirmLabel: 'Jogar' })) return;
     setNotice(null);
     try { await onLaunch(game.id, installationId); }
-    catch (error) { setNotice(error instanceof Error ? error.message : 'Não foi possível iniciar este jogo.'); }
+    catch (error) { overlay.notify({ kind: 'error', message: error instanceof Error ? error.message : 'Não foi possível iniciar este jogo.' }); }
   };
   if (showImport) return <LocalImportPanel profiles={profiles} onChooseFolder={onChooseFolder} onImport={onImport} onClose={() => setShowImport(false)} onImported={() => setNotice('Biblioteca atualizada.')} />;
+  if (selected) { const fallback = resolveArtwork(selected.identityKey.replace('bacondisc:', '')); const artwork = { ...fallback, ...cached[selected.id] }; return <section className="library-page"><GameDetailsPanel game={selected} artwork={artwork} onPlay={(installationId) => void launch(selected, installationId)} onClose={() => setSelected(null)} onEditArtwork={() => setNotice('Use o seletor de artes abaixo para escolher uma imagem.')} />{notice && <p className="settings-notice" role="status">{notice}</p>}<ArtworkPicker gameId={selected.id} title={selected.title} service={tauriMetadata} onUpdated={() => void refreshArtwork(selected.id)} /></section>; }
   return <section className="library-page">
     <div className="section-heading"><div><p className="eyebrow">COLEÇÃO LOCAL</p><h1>Minha Biblioteca</h1></div><span>{visible.length} jogos</span></div>
     <div className="library-toolbar"><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar na biblioteca" aria-label="Buscar na biblioteca" /><button className="action-button" onClick={() => setShowImport(true)}>Adicionar jogos locais</button>{([['all', 'Todos'], ['installed', 'Instalados'], ['disc', 'Com disco'], ['favorites', 'Favoritos']] as const).map(([id, label]) => <button key={id} onClick={() => setFilter(id)} className={filter === id ? 'library-filter library-filter--active' : 'library-filter'}>{label}</button>)}</div>
@@ -57,6 +61,5 @@ export function LibraryPage({ games, profiles, onToggleFavorite, onChooseFolder,
         <div className="library-card__actions">{local && <button className="action-button" aria-label={'Jogar ' + game.title} onClick={() => void launch(game, local.id)}>Jogar</button>}<button className="library-filter" onClick={() => setSelected(game)}>Artes</button></div>
       </article>;
     }) : <p className="empty-copy">Nenhum jogo corresponde aos filtros atuais.</p>}</div>
-    {selected && <ArtworkPicker gameId={selected.id} title={selected.title} service={tauriMetadata} onUpdated={() => void refreshArtwork(selected.id)} />}
   </section>;
 }

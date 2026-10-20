@@ -1,0 +1,10 @@
+import type { CatalogGame } from '../../services/contracts';
+
+export function GameDetailsPanel({ game, artwork, onPlay, onClose, onEditArtwork }: { game: CatalogGame; artwork: { background: string; cover?: string; logo?: string }; onPlay: (installationId: number) => void; onClose: () => void; onEditArtwork?: () => void }) {
+  const launchable = game.installations.filter((item) => item.available && item.emulatorProfileId);
+  const main = launchable[0];
+  return <section className="game-details" data-testid="game-details" style={{ backgroundImage: `linear-gradient(90deg, rgb(7 14 25 / 96%) 0%, rgb(7 14 25 / 78%) 48%, rgb(7 14 25 / 20%) 100%), url(${artwork.background})` }} aria-label={`Detalhes de ${game.title}`}>
+    <button className="library-filter game-details__back" onClick={onClose}>Voltar</button>
+    <div className="game-details__content">{artwork.cover && <img className="game-details__cover" src={artwork.cover} alt={`Capa de ${game.title}`} />}<div><p className="eyebrow">{game.platform.toUpperCase()} · COLEÇÃO LOCAL</p><h2>{artwork.logo ? <img className="game-details__logo" src={artwork.logo} alt={game.title} /> : game.title}</h2><p className="game-details__copy">{main ? 'Pronto para jogar na instalação selecionada.' : 'Nenhuma instalação disponível para iniciar agora.'}</p><div className="game-details__metadata"><span>{launchable.length || 0} instalação{launchable.length === 1 ? '' : 'ões'} disponível{launchable.length === 1 ? '' : 'is'}</span>{game.installations.some((item) => item.requiresDisc) && <span>Disco necessário</span>}</div><div className="game-details__actions">{main && <button className="action-button" aria-label={`Jogar ${game.title}`} onClick={() => onPlay(main.id)}>Jogar</button>}{onEditArtwork && <button className="action-button action-button--ghost" onClick={onEditArtwork}>Artes</button>}</div>{launchable.length > 1 && <div className="game-details__installations" aria-label="Instalações disponíveis">{launchable.slice(1).map((item) => <button className="library-filter" key={item.id} onClick={() => onPlay(item.id)}>Jogar por {item.source}</button>)}</div>}</div></div>
+  </section>;
+}
